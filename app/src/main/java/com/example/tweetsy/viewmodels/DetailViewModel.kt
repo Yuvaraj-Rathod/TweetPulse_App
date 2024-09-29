@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tweetsy.model.TweetListItem
 import com.example.tweetsy.repository.TweetRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: TweetRepository) : ViewModel() {
 
     val tweets : StateFlow<List<TweetListItem>>
@@ -15,7 +17,7 @@ class DetailViewModel @Inject constructor(private val repository: TweetRepositor
 
     init {
         viewModelScope.launch {
-            repository.getTweets("android")
+            repository.getTweets("fact")
         }
     }
 }
