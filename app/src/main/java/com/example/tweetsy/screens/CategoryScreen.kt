@@ -1,15 +1,22 @@
 package com.example.tweetsy.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,37 +29,70 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tweetsy.viewmodels.CategoryViewModel
 import com.example.tweetsy.R
 
 @Composable
-fun CategoryScreen() {
-    val categoryViewModel : CategoryViewModel = viewModel()
+fun CategoryScreen(onClick: (category : String) -> Unit) {
+    val categoryViewModel : CategoryViewModel = hiltViewModel()
     val categories: State<List<String>> = categoryViewModel.categories.collectAsState()
+
+    if (categories.value.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black), // Dark background
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    color = Color.White, // Progress indicator color
+                    strokeWidth = 4.dp
+                )
+                Spacer(modifier = Modifier.height(16.dp)) // Add spacing between elements
+                Text(
+                    text = "Loading...",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold, // Bold text
+                        color = Color.White // Text color
+                    )
+                )
+            }
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.SpaceAround)
     {
        items(categories.value.distinct()){
-           CategoryItem(category = it)
+           CategoryItem(category = it, onClick)
        }
     }
 }
 
 @Composable
-fun CategoryItem(category: String) {
+fun CategoryItem(category: String,onClick : (category : String) -> Unit) {
 
     Box(modifier = Modifier
         .padding(4.dp)
         .size(160.dp)
         .clip(RoundedCornerShape(8.dp))
-        .paint(painter = painterResource(id =R.drawable.categorybg),
-            contentScale = ContentScale.Inside)
-        .border(1.dp, Color(0XFFEEEEEE)),
+        .paint(
+            painter = painterResource(id = R.drawable.categorybg),
+            contentScale = ContentScale.Inside
+        )
+        .border(1.dp, Color(0XFFEEEEEE))
+        .clickable { onClick(category) },
         contentAlignment = Alignment.BottomCenter
     ) {
         Text(text = category,
